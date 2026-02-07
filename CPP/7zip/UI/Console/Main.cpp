@@ -163,6 +163,7 @@ static const char * const kHelpString =
     "  -o{Directory} : set Output directory\n"
     #ifndef Z7_NO_CRYPTO
     "  -p{Password} : set Password\n"
+    "  -pfd{N} : read Password from fd\n"
     #endif
     "  -r[-|0] : Recurse subdirectories for name search\n"
     "  -sa{a|e|s} : set Archive name mode\n"
@@ -1333,6 +1334,7 @@ int Main2(
       #ifndef Z7_NO_CRYPTO
       ecs->PasswordIsDefined = options.PasswordEnabled;
       ecs->Password = options.Password;
+      ecs->PasswordFd = options.PasswordFd;
       #endif
 
       ecs->Init(g_StdStream, g_ErrStream, percentsStream, options.DisablePercents);
@@ -1517,6 +1519,7 @@ int Main2(
           #ifndef Z7_NO_CRYPTO
           options.PasswordEnabled,
           options.Password,
+          options.PasswordFd,
           #endif
           &options.Properties,
           numErrors, numWarnings);
@@ -1551,6 +1554,7 @@ int Main2(
         (options.PasswordEnabled && !options.Password.IsEmpty());
     openCallback.PasswordIsDefined = passwordIsDefined;
     openCallback.Password = options.Password;
+    openCallback.PasswordFd = options.PasswordFd;
     #endif
 
     CUpdateCallbackConsole callback;
@@ -1564,6 +1568,7 @@ int Main2(
     callback.PasswordIsDefined = passwordIsDefined;
     callback.AskPassword = (options.PasswordEnabled && options.Password.IsEmpty());
     callback.Password = options.Password;
+    callback.PasswordFd = options.PasswordFd;
     #endif
 
     callback.StdOutMode = uo.StdOutMode;

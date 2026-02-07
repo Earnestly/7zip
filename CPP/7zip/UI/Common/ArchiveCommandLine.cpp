@@ -120,6 +120,15 @@ static bool StringToUInt32(const wchar_t *s, UInt32 &v)
   return *end == 0;
 }
 
+static bool StringToInt32(const wchar_t *s, Int32 &v)
+{
+  if (*s == 0)
+    return false;
+  const wchar_t *end;
+  v = ConvertStringToInt32(s, &end);
+  return *end == 0;
+}
+
 
 namespace NKey {
 enum Enum
@@ -209,6 +218,7 @@ enum Enum
 
   #ifndef Z7_NO_CRYPTO
   , kPassword
+  , kPasswordFd
   #endif
 };
 
@@ -360,6 +370,7 @@ static const CSwitchForm kSwitchForms[] =
 
   #ifndef Z7_NO_CRYPTO
   , { "p", SWFRM_STRING }
+  , { "pfd", SWFRM_STRING }
   #endif
 };
 
@@ -1460,6 +1471,22 @@ void CArcCmdLineParser::Parse2(CArcCmdLineOptions &options)
   options.PasswordEnabled = parser[NKey::kPassword].ThereIs;
   if (options.PasswordEnabled)
     options.Password = parser[NKey::kPassword].PostStrings[0];
+
+  options.PasswordFd = 0;
+
+  if (parser[NKey::kPasswordFd].ThereIs)
+  {
+    const UString &s = parser[NKey::kPasswordFd].PostStrings[0];
+    if (s.IsEmpty())
+      throw CArcCmdLineException("No file descriptor given to -pfd", s);
+    else
+    {
+      Int32 v;
+      if (!StringToInt32(s, v))
+        throw CArcCmdLineException("A file descriptor is required for -pfd", s);
+      options.PasswordFd = (int)v;
+    }
+  }
   #endif
 
   options.ShowDialog = parser[NKey::kShowDialog].ThereIs;
